@@ -1,0 +1,81 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>Imprimo.</title>
+  <meta name="description" content="A helper for printing on SOC">
+  <meta name="author" content="Johannes Choo">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="{% static 'imprimo/css/felltypes.css' %}" />
+  <link rel="stylesheet" href="{% static 'imprimo/css/skeleton.css' %}">
+  <link rel="stylesheet" href="{% static 'imprimo/css/main.css' %}" />
+  <link rel="stylesheet" href="{% static 'imprimo/css/layout.css' %}">
+</head>
+<div class="container" id="container">
+  <div class="row">
+  <div class="six columns" id="header">
+    <h1 id="sitetitle">IMPRIMO</h1>
+    <h2 id="subtitle1">OR</h2>
+    <h2 id="subtitle">a Tool to aid Modern Students of Computer Science
+      in the Replication of Electric Palimpsests.</h2>
+    <div id="headerflowers"></div>
+  </div>
+  <div class="ten columns" id="formdiv">
+    <form action="/imprimo/submit/" method="post" enctype="multipart/form-data" id="submissionform">
+      {% csrf_token %}
+      <div class="formrow" id="filefield">
+        <p>File to print: </p>
+        <div class="inputdiv">
+          {{ form.attachedfile }}
+          <button type="button" id="dummyfile"><span id="dftext">Choose a .ps or .pdf file...</span></button>
+        </div>
+      </div>
+      <div class="formrow" id="userfield">
+        <p>Your sunfire username:</p>
+        <div class="inputdiv">{{ form.username }}</div>
+      </div>
+      <div class="formrow" id="passfield">
+        <p>Your sunfire password:</p>
+        <div class="inputdiv">{{ form.password }}</div>
+      </div>
+      <div class="formrow" id="printerfield">
+        <p>Choose a Printer: </p>
+        <div class="inputdiv">
+          {% for radio in form.printer %}
+          <input type="radio" name="{{ radio.name }}" value="{{ radio.choice_value }}" id="id_{{ radio.name }}_{{ radio.choice_value }}">
+          <label for="id_{{ radio.name }}_{{ radio.choice_value }}">{{ radio.choice_label }}</label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="formrow">
+        <div class="eight columns alpha" id="captchafield">
+          <p>CAPTCHA: What is the module code of <em>Discrete Structures</em>?</p>
+          <div class="inputdiv">{{ form.captcha }}</div>
+        </div>
+        <div class="two columns omega" id="submitfield">
+            <input id="formsubmit" type="submit" value="Print" disabled/>
+        </div>
+      </div>
+    </form>
+  </div>
+  </div>
+  <div class="sixteen columns" id="statusdiv">
+    <div id="statusflowers"></div>
+    <p>Session {{ keys }}</p>
+    <p id="jobstatus">Please wait...</p>
+    <div id="prevstatusdiv">
+      <ul id="prevstatus">
+      </ul>
+      <p id="prevstatustoggle">Click to show more...</p>
+    </div>
+  <p id="magicbox">Magic box</p>
+  </div>
+</div> <!-- container -->
+
+<!-- script files here -->
+<script src="{% static 'libs/html5-formdata/0/formdata.js' %}"></script>
+<script src="{% static 'libs/jquery/2.0.3/jquery.js' %}"></script>
+<script src="{% static 'libs/jquery.form/3.32/jquery.form.js' %}"></script>
+<script src="{% static 'imprimo/js/main.js' %}"></script>
+</body>
+</html>
