@@ -55,7 +55,8 @@ def handleJob(job, username, password):
         (outstr, errstr) = exec_command(cmd)
         if outstr != "Job sent!\n":
             raise paramiko.SSHException("Error sending file to printer.\nstderr: %s\nstdout: %s" % (errstr, outstr))
-        job.update_status("Done printing!")
+        job.update_status("Done sending print job!")
+        exec_command('rm -f "'+rfilename+'"')
 
         client.close()
         job.delete()
@@ -64,6 +65,7 @@ def handleJob(job, username, password):
         job.update_status('Caught exception: %s: %s' % (e.__class__, e))
         traceback.print_exc()
         try:
+            exec_command('rm -f "'+rfilename+'"')
             job.attachedfile.close()
             client.close()
         except:
