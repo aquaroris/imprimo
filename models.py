@@ -10,6 +10,7 @@ class JobSession(models.Model):
     attachedfile = models.FileField(
             upload_to='imprimo',
             validators=[validate_printable])
+    printer = models.CharField(max_length=12)
 
     def __unicode__(self):
         returnstring = "id: %s, status: %s" % (str(self.id), self.status)

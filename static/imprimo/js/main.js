@@ -47,7 +47,6 @@ $(function () {
         };
     };
 
-
     var subPre = function () {
         // This function is called when user clicks on the submit job
         // button, before the data is sent through AJAX
@@ -62,12 +61,10 @@ $(function () {
         timeoutID = setTimeout(bgCheckStatus($), 1000);
     };
 
-    // TODO: Form controls should start off disabled in CSS.
-
     var initialCheckSuccess = function (response, status, jqXHR) {
         // This function is called after the initial AJAX query
         if (response !== '') {
-            console.log("initialCheckSuccess: "+response);
+            updateJobStatus("Restoring previous session...")
             updateJobStatuses(response);
             timeoutID = setTimeout(bgCheckStatus($), 1000);
         } else {
@@ -147,6 +144,14 @@ $(function () {
     $id_username.change(updateBackground($id_username));
     $id_password.change(updateBackground($id_password));
     $id_captcha.change(updateBackground($id_captcha));
+    $("#prevstatustoggle").click(function () {
+        if ($("#prevstatustoggle").text() === "Click to show more...") {
+            $("#prevstatustoggle").text("Click to show less...");
+        } else {
+            $("#prevstatustoggle").text("Click to show more...");
+        }
+        $("#prevstatus").slideToggle();
+    });
 
     // Stuff to do at when page is loaded
 

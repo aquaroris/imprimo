@@ -40,9 +40,15 @@ def handleJob(job, username, password):
             if outstr != "Converted!\n":
                 raise "Error while converting from PDF to PostScript."
             (stdin, stdout, stderr) = client.exec_command('rm -f "'+rfilename+'"')
-            (outstr, errstr) = stdout.read(), stderr.read()
+            outstr, errstr = stdout.read(), stderr.read()
             rfilename += '.ps'
-        job.update_status("Ready to print!")
+
+        job.update_status("Sending print job to "+job.printer+".")
+        (stdin, stdout, stderr) = client.exec_command("lpr -P "+job.printer+" "+rfilename+" && echo 'Job Sent!'")
+        (outstr, errstr) = stdout.read(), stderr.read()
+        if outstr != "Job sent!\n":
+            raise "Error sending file to printer."
+        job.update_status("Done printing!")
 
         client.close()
 

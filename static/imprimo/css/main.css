@@ -31,7 +31,7 @@ body {
   /* some shade of yellow */
   font-family: "IM Fell English PRO", "Times New Roman", Georgia, serif;
   text-align: center;
-  background: #fff;
+  background: #fafafa;
   font-size: 100%;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
@@ -98,6 +98,7 @@ button, input[type='submit'], #printerfield label {
   color: inherit;
 }
 input:disabled, button:disabled {
+  background: none;
   color: #bbb;
 }
 #printerfield label {
@@ -131,6 +132,9 @@ input:disabled, button:disabled {
 }
 #prevstatusdiv {
   border-top: 1px solid #333;
+}
+#prevstatus {
+  display: none;
 }
 #prevstatus li {
   background: #f3ffdd;

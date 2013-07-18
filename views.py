@@ -11,10 +11,8 @@ import json
 
 def main(request):
     form = JobRequestForm
-    request.session['cur_id'] = 0.5#random.random()
     return render(request, 'imprimo/main.html', {
             'form': form,
-            'keys': [request.session['cur_id'], request.session.get("prev_id", "none")]
     })
 
 # Handle AJAX submissions from the form
@@ -26,7 +24,8 @@ def submit(request):
             job = JobSession(
                     status="Starting task...",
                     all_status="Starting task...",
-                    attachedfile=form.cleaned_data['attachedfile'])
+                    attachedfile=form.cleaned_data['attachedfile'],
+                    printer=form.cleaned_data['printer'])
             job.save()
             handleJob.delay(
                     job,
