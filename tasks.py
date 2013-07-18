@@ -8,6 +8,15 @@ PORT = 22
 @task
 def handleJob(job, username, password):
     try:
+        stdin, stdout, stderr = None, None, None
+        outstr, errstr = None, None
+
+        def exec_command(cmd):
+            job.update_status("Executing command %s" % cmd)
+            (stdin, stdout, stderr) = client.exec_command(cmd)
+            (outstr, errstr) = stdout.read(), stderr.read()
+            return outstr, errstr
+
         job.update_status("Initializing SSHClient...")
         client = paramiko.SSHClient()
 
@@ -23,36 +32,35 @@ def handleJob(job, username, password):
 
         sftpclient = client.open_sftp()
 
-
         rfilename = "imprimo." + str(job.id) + job.attachedfilename()
         job.update_status("Copying file over to ~/%s" % rfilename)
         sftpclient.putfo(job.attachedfile, rfilename)
         sftpclient.close()
         filetype = job.filetype()
         job.attachedfile.close()
-        #job.attachedfile.delete()
+        job.attachedfile.delete()
 
         if filetype == 'pdf':
             job.update_status("Converting from PDF to PostScript... this might take quite a while.")
-            (stdin, stdout, stderr) = client.exec_command(
-                'pdf2ps "'+rfilename+'" "'+rfilename+'.ps" && echo "Converted!"')
-            (outstr, errstr) = stdout.read(), stderr.read()
+            cmd = 'pdf2ps "%s" "%s.ps" && echo "Converted!"' \
+                    % (rfilename, rfilename)
+            (outstr, errstr) = exec_command(cmd)
             if outstr != "Converted!\n":
-                raise "Error while converting from PDF to PostScript."
-            (stdin, stdout, stderr) = client.exec_command('rm -f "'+rfilename+'"')
-            outstr, errstr = stdout.read(), stderr.read()
+                raise paramiko.SSHException("Error while converting from PDF to PostScript.\nstderr: %s\nstdout: %s" % (errstr, outstr))
+            exec_command('rm -f "'+rfilename+'"')
             rfilename += '.ps'
 
         job.update_status("Sending print job to "+job.printer+".")
-        (stdin, stdout, stderr) = client.exec_command("lpr -P "+job.printer+" "+rfilename+" && echo 'Job Sent!'")
-        (outstr, errstr) = stdout.read(), stderr.read()
+        cmd = "lpr -P %s %s && echo 'Job Sent!'" % (job.printer, rfilename)
+        (outstr, errstr) = exec_command(cmd)
         if outstr != "Job sent!\n":
-            raise "Error sending file to printer."
+            raise paramiko.SSHException("Error sending file to printer.\nstderr: %s\nstdout: %s" % (errstr, outstr))
         job.update_status("Done printing!")
 
         client.close()
+        job.delete()
 
-    except Exception, e:
+    except Exception as e:
         job.update_status('Caught exception: %s: %s' % (e.__class__, e))
         traceback.print_exc()
         try:
@@ -61,7 +69,7 @@ def handleJob(job, username, password):
         except:
             pass
     finally:
-        pass
-        #job.attachedfile.delete()
+        job.attachedfile.delete()
+        job.delete()
 
 

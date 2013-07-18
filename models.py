@@ -19,7 +19,8 @@ class JobSession(models.Model):
         return returnstring
 
     def update_status(self, status):
-        self.status += "\n"+status
+        update = JobSession.objects.get(pk=self.pk)
+        self.status = update.status+"\n"+status
         self.all_status += "\n"+status
         self.save(update_fields=['status', 'all_status'])
     def print_status(self):

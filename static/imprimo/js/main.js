@@ -1,7 +1,7 @@
 $(function () {
     "use strict";
 
-    // Set up helpers
+    // Cache elements
     var $filefield = $('#filefield'),
         $dummyfile = $('#dummyfile'),
         $id_attachedfile = $('#id_attachedfile'),
@@ -14,6 +14,8 @@ $(function () {
         $formsubmit = $('#formsubmit'),
         $jobstatus = $('#jobstatus'),
         $prevstatus = $('#prevstatus'),
+        $prevstatustoggle = $('#prevstatustoggle'),
+        $input = $('input'),
         timeoutID = null;
 
     // Functions related to job status indicators
@@ -24,7 +26,6 @@ $(function () {
     };
     var updateJobStatuses = function (jsonString) {
         var statusList = JSON.parse(jsonString);
-        console.log("statusList: " + statusList);
         $.each(statusList, function(index, value) {
             updateJobStatus(value);
         });
@@ -34,9 +35,9 @@ $(function () {
 
     var bgCheckStatus = function ($) {
         var checkSuccess = function (response, status, jqXHR) {
-            // TODO: Handle case where the job has already ended
+            console.log(response);
             updateJobStatuses(response);
-            timeoutID = setTimeout(bgCheckStatus($), 500);
+            timeoutID = setTimeout(bgCheckStatus($), 5000);
         };
         return function () {
             $.ajax({
@@ -50,7 +51,7 @@ $(function () {
     var subPre = function () {
         // This function is called when user clicks on the submit job
         // button, before the data is sent through AJAX
-        $('input').prop('disabled', true);
+        $input.prop('disabled', true);
         return true;
     };
     var subProg = function (event, position, total, percentComplete) {
@@ -58,17 +59,17 @@ $(function () {
     };
     var subSuccess = function (response, status, jqXHR) {
         updateJobStatus(response);
-        timeoutID = setTimeout(bgCheckStatus($), 1000);
+        timeoutID = setTimeout(bgCheckStatus($), 5000);
     };
 
     var initialCheckSuccess = function (response, status, jqXHR) {
         // This function is called after the initial AJAX query
         if (response !== '') {
-            updateJobStatus("Restoring previous session...")
+            updateJobStatus("Restoring previous session...");
             updateJobStatuses(response);
             timeoutID = setTimeout(bgCheckStatus($), 1000);
         } else {
-            $("input").prop("disabled", false);
+            $input.prop("disabled", false);
         }
     };
 
@@ -144,13 +145,13 @@ $(function () {
     $id_username.change(updateBackground($id_username));
     $id_password.change(updateBackground($id_password));
     $id_captcha.change(updateBackground($id_captcha));
-    $("#prevstatustoggle").click(function () {
-        if ($("#prevstatustoggle").text() === "Click to show more...") {
-            $("#prevstatustoggle").text("Click to show less...");
+    $prevstatustoggle.click(function () {
+        if ($prevstatustoggle.text() === "Click to show more...") {
+            $prevstatustoggle.text("Click to show less...");
         } else {
-            $("#prevstatustoggle").text("Click to show more...");
+            $prevstatustoggle.text("Click to show more...");
         }
-        $("#prevstatus").slideToggle();
+        $prevstatus.slideToggle();
     });
 
     // Stuff to do at when page is loaded
@@ -170,18 +171,4 @@ $(function () {
     });
 
     updateJobStatus("Please fill in the form before clicking Print.");
-
-    // Testing function
-    var v = 0;
-    $("#magicbox").click(function () {
-        console.log(v);
-        updateJobStatus("v = "+v);
-        v++;
-        updateJobStatus("v = "+v);
-        v++;
-        updateJobStatus("v = "+v);
-        v++;
-        updateJobStatus("v = "+v);
-        v++;
-    });
 });
