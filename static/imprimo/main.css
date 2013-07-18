@@ -29,7 +29,7 @@ em {
 
 body {
   /* some shade of yellow */
-  font-family: "IM Fell English PRO", "Times New Roman", Georgia, serif;
+  font-family: "IM Fell English", "Times New Roman", Georgia, serif;
   text-align: center;
   background: #fafafa;
   font-size: 100%;
@@ -50,7 +50,7 @@ h1, h2 {
 h1 {
   font-size: 3.5em;
   color: #ba7;
-  font-family: "IM Fell Double Pica PRO", "Times New Roman", Georgia, serif;
+  font-family: "IM Fell Double Pica", "Times New Roman", Georgia, serif;
 }
 h2 {
   font-size: 1.5em;
@@ -79,7 +79,7 @@ h2#subtitle {
 }
 input[type='text'], input[type='password'] {
   border: 0;
-  font-family: "IM Fell English PRO", "Times New Roman", Georgia, serif;
+  font-family: "IM Fell English", "Times New Roman", Georgia, serif;
   font-size: 1em;
   text-align: center;
   background-color: #eee;
@@ -90,7 +90,7 @@ button, input[type='submit'], #printerfield label {
   border: 0;
   background-color: #eee;
   padding: 1px 4px;
-  font-family: "IM Fell English PRO", "Times New Roman", Georgia, serif;
+  font-family: "IM Fell English", "Times New Roman", Georgia, serif;
   font-size: 1em;
   color: #333;
 }

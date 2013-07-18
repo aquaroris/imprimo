@@ -6,10 +6,10 @@
   <meta name="description" content="A helper for printing on SOC">
   <meta name="author" content="Johannes Choo">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <link rel="stylesheet" href="{% static 'imprimo/css/felltypes.css' %}" />
-  <link rel="stylesheet" href="{% static 'imprimo/css/skeleton.css' %}">
-  <link rel="stylesheet" href="{% static 'imprimo/css/main.css' %}" />
-  <link rel="stylesheet" href="{% static 'imprimo/css/layout.css' %}">
+  <link href='http://fonts.googleapis.com/css?family=IM+Fell+Double+Pica+SC|IM+Fell+English:400,400italic' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/skeleton/1.2/stylesheets/skeleton.css">
+  <link rel="stylesheet" href="{% static 'imprimo/main.css' %}" />
+  <link rel="stylesheet" href="{% static 'imprimo/layout.css' %}">
 </head>
 <div class="container" id="container">
   <div class="row">
@@ -71,9 +71,9 @@
 </div> <!-- container -->
 
 <!-- script files here -->
-<script src="{% static 'libs/html5-formdata/0/formdata.js' %}"></script>
-<script src="{% static 'libs/jquery/2.0.3/jquery.js' %}"></script>
-<script src="{% static 'libs/jquery.form/3.32/jquery.form.js' %}"></script>
-<script src="{% static 'imprimo/js/main.js' %}"></script>
+<script src="{% static 'imprimo/formdata.js' %}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.form/3.32/jquery.form.min.js"></script>
+<script src="{% static 'imprimo/main.js' %}"></script>
 </body>
 </html>

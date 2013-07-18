@@ -35,7 +35,6 @@ $(function () {
 
     var bgCheckStatus = function ($) {
         var checkSuccess = function (response, status, jqXHR) {
-            console.log(response);
             updateJobStatuses(response);
             timeoutID = setTimeout(bgCheckStatus($), 5000);
         };
