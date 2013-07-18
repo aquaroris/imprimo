@@ -20,13 +20,11 @@ $(function () {
 
     // Functions related to job status indicators
     var updateJobStatus = function (text) {
-        if (text === '') { return false; }
         $('<li>'+$jobstatus.text()+'</li>').hide().prependTo($prevstatus).slideDown();
         $jobstatus.text(text);
     };
-    var updateJobStatuses = function (jsonString) {
-        var statusList = JSON.parse(jsonString);
-        $.each(statusList, function(index, value) {
+    var updateJobStatuses = function (jsonArr) {
+        $.each(jsonArr, function(index, value) {
             updateJobStatus(value);
         });
     };
@@ -42,6 +40,7 @@ $(function () {
             $.ajax({
                 type: 'GET',
                 url: 'jobstatus/',
+                dataType: 'json',
                 success: checkSuccess,
             });
         };
@@ -63,7 +62,7 @@ $(function () {
 
     var initialCheckSuccess = function (response, status, jqXHR) {
         // This function is called after the initial AJAX query
-        if (response !== '') {
+        if (!$.isEmptyObject(response)) {
             updateJobStatus("Restoring previous session...");
             updateJobStatuses(response);
             timeoutID = setTimeout(bgCheckStatus($), 1000);
@@ -112,6 +111,7 @@ $(function () {
     $('#submissionform').ajaxForm({
         beforeSubmit: subPre,
         uploadProgress: subProg,
+        dataType: "text",
         success: subSuccess,
     });
 
@@ -166,6 +166,7 @@ $(function () {
         // TODO: handle failure
         type: 'GET',
         url: 'prevstatus/',
+        dataType: 'json',
         success: initialCheckSuccess,
     });
 

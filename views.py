@@ -6,7 +6,6 @@ from .models import JobSession
 from .forms import JobRequestForm
 from .tasks import handleJob
 
-import random
 import json
 
 def main(request):
@@ -33,7 +32,7 @@ def submit(request):
                     form.cleaned_data['password'])
             returnmessage = "Uploading done!"
             request.session['prev_id'] = job.pk
-            return HttpResponse(returnmessage)
+            return HttpResponse(returnmessage, content_type="text/plain")
         else:
             return HttpResponse("Invalid Form")
     else:
@@ -42,13 +41,25 @@ def submit(request):
 # return status
 def jobstatus(request):
     if not request.session.get('prev_id'):
-        return HttpResponse('')
+        return HttpResponse('{}', content_type="application/json")
     job = JobSession.objects.get(id=request.session['prev_id'])
-    return HttpResponse(json.dumps(job.print_status().split('\n')))
+    return HttpResponse(
+        json.dumps(
+            job.print_status().split('\n'),
+            separators=(',',':')
+        ),
+        content_type="application/json"
+    )
 
 def prevstatus(request):
     try:
         job = JobSession.objects.get(id=request.session['prev_id'])
-        return HttpResponse(json.dumps(job.print_all_status().split('\n')))
+        return HttpResponse(
+            json.dumps(
+                job.print_all_status().split('\n'),
+                separators=(',',':')
+            ),
+            content_type="applicaton/json"
+        )
     except (ObjectDoesNotExist, KeyError):
-        return HttpResponse('')
+        return HttpResponse('{}',content_type="application/json")
