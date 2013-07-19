@@ -2,7 +2,7 @@ HOSTNAME = 'localhost'
 PORT = 22
 PRINTERS = (
     ('psts', 'psts'),
-    ('pstsb', 'pstb')
+    ('pstsb', 'pstb'),
     ('pstsc', 'pstsc'),
     ('psc008', 'psc008'),
     ('psc011', 'psc011'),
