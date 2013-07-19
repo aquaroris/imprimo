@@ -8,7 +8,7 @@ PRINTERS = (
     ('psc011', 'psc011'),
 )
 
-CAPTCHA_TUPLES = {
-    'What is the module code for <em>Discrete Structures</em>?': 'cs1231',
-    'What is the module code for <em>Linear Algebra I</em>?': 'ma1101r',
-}
+CAPTCHA_TUPLES = (
+    ('What is the module code for <em>Discrete Structures</em>?', 'cs1231'),
+    ('What is the module code for <em>Linear Algebra I</em>?', 'ma1101r'),
+)

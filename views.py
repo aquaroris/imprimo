@@ -5,20 +5,26 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import JobSession
 from .forms import JobRequestForm
 from .tasks import handleJob
+from .config import CAPTCHA_TUPLES
 
+import random
 import json
 
 def main(request):
     form = JobRequestForm
+    captcha = random.choice(CAPTCHA_TUPLES)
+    request.session['captcha'] = captcha[1]
     return render(request, 'imprimo/main.html', {
             'form': form,
+            'captcha': captcha[0]
     })
 
 # Handle AJAX submissions from the form
 def submit(request):
     if request.method == 'POST':
         form = JobRequestForm(request.POST, request.FILES)
-        if form.is_valid():
+        if form.is_valid() and \
+            form.cleaned_data['captcha'].lower() == request.session['captcha']:
             # handle form
             job = JobSession(
                     status="Starting task...",
