@@ -84,15 +84,18 @@ $(function () {
     };
     var validFile = function () {
         var fname = $id_attachedfile.val();
-        if (fname.slice(-4) !== ".pdf" && fname.slice(-2) !== ".ps") {
+        if ($id_attachedfile.val() === '') {
             return false;
         }
+        //if (fname.slice(-4) !== ".pdf" && fname.slice(-2) !== ".ps") {
+        //    return false;
+        //}
         return true;
     };
     var updateAttachedFile = function () {
         var fname = $id_attachedfile.val();
         if (!validFile()) {
-            $("#dftext").text("Choose a valid .pdf or .ps file.");
+            $("#dftext").text("Choose a .pdf or .ps file.");
             $dummyfile.css({
                 "background-color": "#eee",
                 "color": "#bbb"

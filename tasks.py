@@ -2,8 +2,7 @@ from celery import task
 import paramiko
 import traceback
 
-HOSTNAME = 'localhost'
-PORT = 22
+from .config import HOSTNAME, PORT
 
 @task
 def handleJob(job, username, password):

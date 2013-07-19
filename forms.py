@@ -1,7 +1,6 @@
 from django import forms
 from .validators import validate_printable
-
-PRINTERS = ((choice, choice) for choice in ("psts", "pstsb", "pstsc", "psc008", "psc011"))
+from .config import PRINTERS
 
 class JobRequestForm(forms.Form):
     username = forms.CharField(max_length=240,
