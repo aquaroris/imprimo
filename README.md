@@ -45,3 +45,4 @@ ensure that your media directory is writable by Django.
 For the app to properly function a celery worker needs to be running.
 
 [first-steps-with-django]: http://docs.celeryproject.org/en/latest/django/first-steps-with-django.html "Celery: First Steps with Django"
+TODO: Add in the captcha stuff.
