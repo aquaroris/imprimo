@@ -57,8 +57,8 @@ def handleJob(job, username, password):
         job.update_status("Done sending print job!")
         exec_command('rm -f "'+rfilename+'"')
 
+        job.completed = True
         client.close()
-        job.delete()
 
     except Exception as e:
         job.update_status('Caught exception: %s: %s' % (e.__class__, e))
@@ -71,6 +71,6 @@ def handleJob(job, username, password):
             pass
     finally:
         job.attachedfile.delete()
-        job.delete()
+        job.completed = True
 
 

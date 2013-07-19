@@ -11,6 +11,7 @@ class JobSession(models.Model):
             upload_to='imprimo',
             validators=[validate_printable])
     printer = models.CharField(max_length=12)
+    completed = models.BooleanField()
 
     def __unicode__(self):
         returnstring = "id: %s, status: %s" % (str(self.id), self.status)
@@ -26,11 +27,17 @@ class JobSession(models.Model):
     def print_status(self):
         status = self.status
         self.status = ''
-        self.save(update_fields=['status'])
+        if self.completed:
+            self.delete()
+        else:
+            self.save(update_fields=['status'])
         return status
     def print_all_status(self):
         self.status = ''
-        self.save(update_fields=['status'])
+        if self.completed:
+            self.deleted()
+        else:
+            self.save(update_fields=['status'])
         return self.all_status
     def attachedfilename(self):
         return os.path.basename(self.attachedfile.name)

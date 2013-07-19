@@ -24,7 +24,8 @@ def submit(request):
                     status="Starting task...",
                     all_status="Starting task...",
                     attachedfile=form.cleaned_data['attachedfile'],
-                    printer=form.cleaned_data['printer'])
+                    printer=form.cleaned_data['printer'],
+                    completed=False)
             job.save()
             handleJob.delay(
                     job,
