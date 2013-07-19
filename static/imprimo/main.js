@@ -33,6 +33,7 @@ $(function () {
 
     var bgCheckStatus = function ($) {
         var checkSuccess = function (response, status, jqXHR) {
+            if ($.isEmptyObject(response)) { return false; }
             updateJobStatuses(response);
             timeoutID = setTimeout(bgCheckStatus($), 5000);
         };
