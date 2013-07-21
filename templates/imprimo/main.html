@@ -27,7 +27,7 @@
         <p>File to print: </p>
         <div class="inputdiv">
           {{ form.attachedfile }}
-          <button type="button" id="dummyfile"><span id="dftext">Choose a .ps or .pdf file...</span></button>
+          <button type="button" id="dummyfile" disabled><span id="dftext">Choose a .ps or .pdf file...</span></button>
         </div>
       </div>
       <div class="formrow" id="userfield">
@@ -42,7 +42,7 @@
         <p>Choose a Printer: </p>
         <div class="inputdiv">
           {% for radio in form.printer %}
-          <input type="radio" name="{{ radio.name }}" value="{{ radio.choice_value }}" id="id_{{ radio.name }}_{{ radio.choice_value }}">
+          <input type="radio" name="{{ radio.name }}" value="{{ radio.choice_value }}" id="id_{{ radio.name }}_{{ radio.choice_value }}" disabled>
           <label for="id_{{ radio.name }}_{{ radio.choice_value }}">{{ radio.choice_label }}</label>
           {% endfor %}
         </div>

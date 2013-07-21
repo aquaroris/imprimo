@@ -103,6 +103,8 @@ input:disabled, button:disabled {
 }
 #printerfield label {
   line-height: 2em;
+  background: none;
+  color: #bbb;
 }
 #printerfield input[type='radio'] {
   display: none;

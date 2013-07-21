@@ -5,7 +5,7 @@ import traceback
 from .config import HOSTNAME, PORT
 
 @task
-def handleJob(job, username, password):
+def handleJob(job, username, password, convert=True, send_print=True):
     try:
         stdin, stdout, stderr = None, None, None
         outstr, errstr = None, None
@@ -39,23 +39,24 @@ def handleJob(job, username, password):
         job.attachedfile.close()
         job.attachedfile.delete()
 
-        if filetype == 'pdf':
+        if filetype == 'pdf' and convert:
             job.update_status("Converting from PDF to PostScript... this might take quite a while.")
             cmd = "/usr/sfw/bin/pdf2ps '%s' '%s.ps' && echo 'Converted!'" \
                     % (rfilename, rfilename)
             (outstr, errstr) = exec_command(cmd)
             if outstr != "Converted!\n":
                 raise paramiko.SSHException("Error while converting from PDF to PostScript.\nstderr: %s\nstdout: %s" % (errstr, outstr))
-            exec_command('rm -f "'+rfilename+'"')
+            exec_command('rm -f "%s"' % (rfilename))
             rfilename += '.ps'
 
-        job.update_status("Sending print job to "+job.printer+".")
-        cmd = "/usr/local/bin/lpr -P '%s' '%s' && echo 'Job Sent!'" % (job.printer, rfilename)
-        (outstr, errstr) = exec_command(cmd)
-        if outstr != "Job sent!":
-            raise paramiko.SSHException("Error sending file to printer.\nstderr: %s\nstdout: %s" % (errstr, outstr))
-        job.update_status("Done sending print job!")
-        exec_command('rm -f "'+rfilename+'"')
+        if send_print:
+            job.update_status("Sending print job to "+job.printer+".")
+            cmd = "/usr/local/bin/lpr -P '%s' '%s' && echo 'Job Sent!'" % (job.printer, rfilename)
+            (outstr, errstr) = exec_command(cmd)
+            if outstr != "Job sent!":
+                raise paramiko.SSHException("Error sending file to printer.\nstderr: %s\nstdout: %s" % (errstr, outstr))
+            job.update_status("Done sending print job!")
+        exec_command('rm -f "%s"' % (rfilename))
 
         job.completed = True
         client.close()

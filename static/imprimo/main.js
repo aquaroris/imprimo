@@ -15,8 +15,9 @@ $(function () {
         $prevstatus = $('#prevstatus'),
         $prevstatustoggle = $('#prevstatustoggle'),
         $input = $('input'),
+        $button = $('button'),
         timeoutID = null,
-        status,
+        jobLog,
         bgCheck,
         firstCheck,
         submit,
@@ -24,7 +25,7 @@ $(function () {
 
 
 
-    status = {
+    jobLog = {
         init: function () {
             $prevstatustoggle.click(function () {
                 if ($prevstatustoggle.text() === "Click to show more...") {
@@ -35,19 +36,19 @@ $(function () {
                 $prevstatus.slideToggle();
             });
         },
-        update: function (jsonArr) {
+        print: function (jsonArr) {
             $.each(jsonArr, function(index, value) {
                 $('<li>'+$jobstatus.text()+'</li>').hide().prependTo($prevstatus).slideDown();
                 $jobstatus.text(value);
             });
-        }
+        },
     };
 
     // Functions related to AJAX
 
     bgCheck = {
         success: function (response, status, jqXHR) {
-            status.update(response);
+            jobLog.print(response);
             timeoutID = setTimeout(this.init(), 5000);
         },
         init: function () {
@@ -74,12 +75,12 @@ $(function () {
         success: function (response, status, jqXHR) {
             // This function is called after the initial AJAX query
             if (!$.isEmptyObject(response)) {
-                status.update(["Restoring previous session..."]);
-                status.update(response);
+                jobLog.print(["Restoring previous session..."]);
+                jobLog.print(response);
                 timeoutID = setTimeout(bgCheck.init(), 1000);
             } else {
                 form.enable();
-                status.update(["Fill in the form, then click Print."]);
+                jobLog.print(["Fill in the form, then click Print."]);
             }
         },
     };
@@ -98,10 +99,10 @@ $(function () {
             return true;
         },
         prog: function (event, position, total, percentComplete) {
-            status.update("Uploading "+$id_attachedfile.val()+"... "+percentComplete+"% uploaded.");
+            jobLog.print("Uploading "+$id_attachedfile.val()+"... "+percentComplete+"% uploaded.");
         },
         success: function (response, status, jqXHR) {
-            status.update(response);
+            jobLog.print(response);
             timeoutID = setTimeout(bgCheck.init(), 2000);
         },
     };
@@ -149,23 +150,40 @@ $(function () {
         },
         highlight: function(selector) {
             selector.css({
-                "background-color": "#eee",
-                "color": "#bbb"
-            });
-        },
-        unhighlight: function(selector) {
-            $dummyfile.css({
                 "background-color": "#edc",
                 "color": "#a20"
             });
         },
+        unhighlight: function(selector) {
+            selector.css({
+                "background-color": "#eee",
+                "color": "#bbb"
+            });
+        },
+        pseudodisabled: function(selector) {
+            selector.css({
+                "background": "none",
+                "color": "#bbb",
+            });
+        },
+        pseudoenabled: function(selector) {
+            selector.css({
+                "background": "",
+                "color": "",
+            });
+        },
         disable: function() {
             $input.prop("disabled", true);
+            $button.prop("disabled", true);
+            this.pseudodisabled($("label"));
         },
         enable: function () {
             $input.prop("disabled", false);
+            $button.prop("disabled", false);
+            this.pseudoenabled($("label"));
         },
         updateText: function($input) {
+            if ($input.prop("disabled")) { return false; }
             if ($input.val()) {
                 this.highlight($input);
             } else {
@@ -173,20 +191,23 @@ $(function () {
             }
         },
         updateAttachedFile: function () {
+            if ($dummyfile.prop("disabled")) {
+                return undefined;
+            }
             var fname = $id_attachedfile.val();
-            if (fname === '') {
+            if (!fname) {
                 $("#dftext").text("Choose a .pdf or .ps file.");
-                this.highlight($dummyfile);
+                this.unhighlight($dummyfile);
             } else {
                 $("#dftext").text($id_attachedfile.val());
-                this.unhighlight($dummyfile);
+                this.highlight($dummyfile);
             }
         },
     };
 
     submit.init();
     form.init();
-    status.init();
+    jobLog.init();
 
     firstCheck.init();
 });

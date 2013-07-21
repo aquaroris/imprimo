@@ -8,7 +8,7 @@ class JobRequestForm(forms.Form):
     password = forms.CharField(max_length=240,
             widget=forms.PasswordInput(attrs={ "disabled": True }))
     attachedfile = forms.FileField(validators=[validate_printable],
-            widget=forms.FileInput(attrs={ "hidden": True }))
+                                   widget=forms.FileInput(attrs={ "hidden": True, "disabled": True }))
     printer = forms.ChoiceField(
             widget=forms.RadioSelect(attrs={ "disabled": True }),
             choices=PRINTERS)
