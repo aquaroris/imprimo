@@ -65,6 +65,10 @@ def jobstatus(request):
 def prevstatus(request):
     try:
         job = JobSession.objects.get(id=request.session['prev_id'])
+        if job.completed:
+            job.attachedfile.delete()
+            job.delete()
+            return HttpResponse('{}', content_type="applicaton/json")
         return HttpResponse(
             json.dumps(
                 job.print_all_status().split('\n'),
