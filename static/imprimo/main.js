@@ -1,7 +1,6 @@
 $(function () {
     "use strict";
 
-    // Cache elements
     var $filefield = $('#filefield'),
         $dummyfile = $('#dummyfile'),
         $id_attachedfile = $('#id_attachedfile'),
@@ -16,163 +15,179 @@ $(function () {
         $prevstatus = $('#prevstatus'),
         $prevstatustoggle = $('#prevstatustoggle'),
         $input = $('input'),
-        timeoutID = null;
+        timeoutID = null,
+        status,
+        bgCheck,
+        firstCheck,
+        submit,
+        form;
 
-    // Functions related to job status indicators
-    var updateJobStatus = function (text) {
-        $('<li>'+$jobstatus.text()+'</li>').hide().prependTo($prevstatus).slideDown();
-        $jobstatus.text(text);
-    };
-    var updateJobStatuses = function (jsonArr) {
-        $.each(jsonArr, function(index, value) {
-            updateJobStatus(value);
-        });
+
+
+    status = {
+        init: function () {
+            $prevstatustoggle.click(function () {
+                if ($prevstatustoggle.text() === "Click to show more...") {
+                    $prevstatustoggle.text("Click to show less...");
+                } else {
+                    $prevstatustoggle.text("Click to show more...");
+                }
+                $prevstatus.slideToggle();
+            });
+        },
+        update: function (jsonArr) {
+            $.each(jsonArr, function(index, value) {
+                $('<li>'+$jobstatus.text()+'</li>').hide().prependTo($prevstatus).slideDown();
+                $jobstatus.text(value);
+            });
+        }
     };
 
     // Functions related to AJAX
 
-    var bgCheckStatus = function ($) {
-        var checkSuccess = function (response, status, jqXHR) {
-            if ($.isEmptyObject(response)) { return false; }
-            updateJobStatuses(response);
-            timeoutID = setTimeout(bgCheckStatus($), 5000);
-        };
-        return function () {
+    bgCheck = {
+        success: function (response, status, jqXHR) {
+            status.update(response);
+            timeoutID = setTimeout(this.init(), 5000);
+        },
+        init: function () {
+            return function () {
+                $.ajax({
+                    type: 'GET',
+                    url: 'jobstatus/',
+                    dataType: 'json',
+                    success: this.success,
+                });
+            };
+        },
+    };
+    firstCheck = {
+        init: function() {
             $.ajax({
+                // TODO: handle failure
                 type: 'GET',
-                url: 'jobstatus/',
+                url: 'prevstatus/',
                 dataType: 'json',
-                success: checkSuccess,
+                success: this.success,
             });
-        };
+        },
+        success: function (response, status, jqXHR) {
+            // This function is called after the initial AJAX query
+            if (!$.isEmptyObject(response)) {
+                status.update(["Restoring previous session..."]);
+                status.update(response);
+                timeoutID = setTimeout(bgCheck.init(), 1000);
+            } else {
+                form.enable();
+                status.update(["Fill in the form, then click Print."]);
+            }
+        },
     };
 
-    var subPre = function () {
-        // This function is called when user clicks on the submit job
-        // button, before the data is sent through AJAX
-        $input.prop('disabled', true);
-        return true;
+    submit = {
+        init: function () {
+            $('#submissionform').ajaxForm({
+                beforeSubmit: this.pre,
+                uploadProgress: this.prog,
+                dataType: "text",
+                success: this.success,
+            });
+        },
+        pre: function () {
+            form.disable();
+            return true;
+        },
+        prog: function (event, position, total, percentComplete) {
+            status.update("Uploading "+$id_attachedfile.val()+"... "+percentComplete+"% uploaded.");
+        },
+        success: function (response, status, jqXHR) {
+            status.update(response);
+            timeoutID = setTimeout(bgCheck.init(), 2000);
+        },
     };
-    var subProg = function (event, position, total, percentComplete) {
-        updateJobStatus("Uploading "+$id_attachedfile.val()+"... "+percentComplete+"% uploaded.");
-    };
-    var subSuccess = function (response, status, jqXHR) {
-        updateJobStatus(response);
-        timeoutID = setTimeout(bgCheckStatus($), 5000);
-    };
-
-    var initialCheckSuccess = function (response, status, jqXHR) {
-        // This function is called after the initial AJAX query
-        if (!$.isEmptyObject(response)) {
-            updateJobStatus("Restoring previous session...");
-            updateJobStatuses(response);
-            timeoutID = setTimeout(bgCheckStatus($), 1000);
-        } else {
-            $input.prop("disabled", false);
-        }
-    };
-
-    // Check for previous jobs.
 
     // Functions related to the form
 
-    var updateBackground = function($inputObject) {
-        if ($inputObject.val()) {
-            $inputObject.css("background-color", "#edc");
-        } else {
-            $inputObject.css("background-color", "#eee");
-        }
-    };
-    var validFile = function () {
-        var fname = $id_attachedfile.val();
-        if ($id_attachedfile.val() === '') {
-            return false;
-        }
-        //if (fname.slice(-4) !== ".pdf" && fname.slice(-2) !== ".ps") {
-        //    return false;
-        //}
-        return true;
-    };
-    var updateAttachedFile = function () {
-        var fname = $id_attachedfile.val();
-        if (!validFile()) {
-            $("#dftext").text("Choose a .pdf or .ps file.");
-            $dummyfile.css({
+    form = {
+        init: function() {
+            this.focusInit();
+            this.textInit();
+            this.fileInit();
+            this.submitInit();
+        },
+        focusInit: function () {
+            $userfield.click(function () {
+                $id_username.focus();
+            });
+            $passfield.click(function () {
+                $id_password.focus();
+            });
+            $captchafield.click(function () {
+                $id_captcha.focus();
+            });
+            $dummyfile.click(function () {
+                $id_attachedfile.get(0).click();
+            });
+        },
+        textInit: function () {
+            $id_username.change(this.updateText($id_username));
+            $id_password.change(this.updateText($id_password));
+            $id_captcha.change(this.updateText($id_captcha));
+        },
+        fileInit: function () {
+            $id_attachedfile.change(this.updateAttachedFile);
+            $dummyfile.submit(function () { return false; });
+        },
+        submitInit: function () {
+            $formsubmit.submit(function () { return false; });
+            $formsubmit.focus(function () {
+                $formsubmit.css({
+                    "background-color": "#edc",
+                    "color": "#a20"
+                });
+            });
+        },
+        highlight: function(selector) {
+            selector.css({
                 "background-color": "#eee",
                 "color": "#bbb"
             });
-        } else {
-            $("#dftext").text($id_attachedfile.val());
+        },
+        unhighlight: function(selector) {
             $dummyfile.css({
                 "background-color": "#edc",
                 "color": "#a20"
             });
-        }
+        },
+        disable: function() {
+            $input.prop("disabled", true);
+        },
+        enable: function () {
+            $input.prop("disabled", false);
+        },
+        updateText: function($input) {
+            if ($input.val()) {
+                this.highlight($input);
+            } else {
+                this.unhighlight($input);
+            }
+        },
+        updateAttachedFile: function () {
+            var fname = $id_attachedfile.val();
+            if (fname === '') {
+                $("#dftext").text("Choose a .pdf or .ps file.");
+                this.highlight($dummyfile);
+            } else {
+                $("#dftext").text($id_attachedfile.val());
+                this.unhighlight($dummyfile);
+            }
+        },
     };
 
-    // Event Handlers for AJAX
+    submit.init();
+    form.init();
+    status.init();
 
-    $('#submissionform').ajaxForm({
-        beforeSubmit: subPre,
-        uploadProgress: subProg,
-        dataType: "text",
-        success: subSuccess,
-    });
-
-    // Event Handlers for the form
-
-    // Transfer Focus Events
-    $userfield.click(function () {
-        $id_username.focus();
-    });
-    $passfield.click(function () {
-        $id_password.focus();
-    });
-    $captchafield.click(function () {
-        $id_captcha.focus();
-    });
-    $dummyfile.click(function () {
-        $id_attachedfile.get(0).click();
-    });
-
-    // Update Field Appearance Events
-    $id_attachedfile.change(updateAttachedFile);
-    $dummyfile.submit(function () { return false; });
-    $formsubmit.submit(function () { return false; });
-    $formsubmit.click(function () {
-        $formsubmit.css({
-            "background-color": "#edc",
-            "color": "#a20"
-        });
-    });
-    $id_username.change(updateBackground($id_username));
-    $id_password.change(updateBackground($id_password));
-    $id_captcha.change(updateBackground($id_captcha));
-    $prevstatustoggle.click(function () {
-        if ($prevstatustoggle.text() === "Click to show more...") {
-            $prevstatustoggle.text("Click to show less...");
-        } else {
-            $prevstatustoggle.text("Click to show more...");
-        }
-        $prevstatus.slideToggle();
-    });
-
-    // Stuff to do at when page is loaded
-
-    // check for a previous session on the server
-    if ($id_attachedfile.val()) {
-        updateAttachedFile();
-    }
-    updateBackground($id_username);
-    updateBackground($id_password);
-    updateBackground($id_captcha);
-    $.ajax({
-        // TODO: handle failure
-        type: 'GET',
-        url: 'prevstatus/',
-        dataType: 'json',
-        success: initialCheckSuccess,
-    });
-
-    updateJobStatus("Please fill in the form before clicking Print.");
+    firstCheck.init();
 });
+

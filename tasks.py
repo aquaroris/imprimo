@@ -41,7 +41,7 @@ def handleJob(job, username, password):
 
         if filetype == 'pdf':
             job.update_status("Converting from PDF to PostScript... this might take quite a while.")
-            cmd = 'pdf2ps "%s" "%s.ps" && echo "Converted!"' \
+            cmd = "/usr/sfw/bin/pdf2ps '%s' '%s.ps' && echo 'Converted!'" \
                     % (rfilename, rfilename)
             (outstr, errstr) = exec_command(cmd)
             if outstr != "Converted!\n":
@@ -50,9 +50,9 @@ def handleJob(job, username, password):
             rfilename += '.ps'
 
         job.update_status("Sending print job to "+job.printer+".")
-        cmd = "lpr -P %s %s && echo 'Job Sent!'" % (job.printer, rfilename)
+        cmd = "/usr/local/bin/lpr -P '%s' '%s' && echo 'Job Sent!'" % (job.printer, rfilename)
         (outstr, errstr) = exec_command(cmd)
-        if outstr != "Job sent!\n":
+        if outstr != "Job sent!":
             raise paramiko.SSHException("Error sending file to printer.\nstderr: %s\nstdout: %s" % (errstr, outstr))
         job.update_status("Done sending print job!")
         exec_command('rm -f "'+rfilename+'"')

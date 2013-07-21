@@ -50,13 +50,17 @@ def jobstatus(request):
     if not request.session.get('prev_id'):
         return HttpResponse('{}', content_type="application/json")
     job = JobSession.objects.get(id=request.session['prev_id'])
-    return HttpResponse(
-        json.dumps(
-            job.print_status().split('\n'),
-            separators=(',',':')
-        ),
-        content_type="application/json"
-    )
+    status = job.print_status()
+    if status == "":
+        return HttpResponse("{}", content_type="application/json")
+    else:
+        return HttpResponse(
+            json.dumps(
+                job.print_status().split('\n'),
+                separators=(',',':')
+            ),
+            content_type="application/json"
+        )
 
 def prevstatus(request):
     try:
@@ -70,3 +74,12 @@ def prevstatus(request):
         )
     except (ObjectDoesNotExist, KeyError):
         return HttpResponse('{}',content_type="application/json")
+
+def reset(request):
+    try:
+        job = JobSession.objects.get(id=request.session['prev_id'])
+        job.attachedfile.delete()
+        job.delete()
+        return HttpResponse("OK")
+    except (ObjectDoesNotExist, KeyError):
+        return HttpResponse("OK")

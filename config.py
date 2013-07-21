@@ -1,4 +1,4 @@
-HOSTNAME = 'localhost'
+HOSTNAME = 'sunfire.comp.nus.edu.sg'
 PORT = 22
 PRINTERS = (
     ('psts', 'psts'),
