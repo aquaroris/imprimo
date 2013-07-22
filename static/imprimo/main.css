@@ -108,6 +108,8 @@ input:disabled, button:disabled {
 }
 #printerfield input[type='radio'] {
   display: none;
+  background: #eee;
+  color: #333;
 }
 #printerfield input[type="radio"]:checked + label {
   background: #edc;

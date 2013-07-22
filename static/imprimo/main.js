@@ -168,8 +168,8 @@ $(function () {
         },
         pseudoenabled: function(selector) {
             selector.css({
-                "background": "#eee",
-                "color": "#bbb",
+                "background": "",
+                "color": "",
             });
         },
         disable: function() {
