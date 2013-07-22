@@ -74,5 +74,6 @@ def handleJob(job, username, password, convert=True, send_print=True):
     finally:
         job.attachedfile.delete()
         job.completed = True
+        job.save(update_fields=['completed'])
 
 
