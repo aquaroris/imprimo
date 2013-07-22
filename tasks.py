@@ -60,6 +60,7 @@ def handleJob(job, username, password, convert=True, send_print=True):
         exec_command('rm -f "%s"' % (rfilename))
 
         job.completed = True
+        job.save(update_fields=['completed'])
         client.close()
 
     except Exception as e:
