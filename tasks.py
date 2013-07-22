@@ -1,6 +1,7 @@
 from celery import task
 import paramiko
 import traceback
+import random
 
 from .config import HOSTNAME, PORT
 
@@ -31,7 +32,7 @@ def handleJob(job, username, password, convert=True, send_print=True):
 
         sftpclient = client.open_sftp()
 
-        rfilename = "imprimo." + str(job.id) + job.attachedfilename()
+        rfilename = "imprimo.%s.%s.%s" % (str(job.id), random.randint(0,100), job.attachedfilename())
         job.update_status("Copying file over to ~/%s" % rfilename)
         sftpclient.putfo(job.attachedfile, rfilename)
         sftpclient.close()
