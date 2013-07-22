@@ -76,7 +76,7 @@ def prevstatus(request):
             ),
             content_type="applicaton/json"
         )
-    except (ObjectDoesNotExist, KeyError):
+    except (ObjectDoesNotExist, KeyError, Exception):
         return HttpResponse('{}',content_type="application/json")
 
 def reset(request):

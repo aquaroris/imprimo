@@ -148,7 +148,7 @@ $(function () {
                 });
             });
         },
-        highlight: function(selector) {
+        highlight: function (selector) {
             selector.css({
                 "background-color": "#edc",
                 "color": "#a20"
@@ -185,7 +185,7 @@ $(function () {
         updateText: function($input) {
             if ($input.prop("disabled")) { return false; }
             if ($input.val()) {
-                this.highlight($input);
+                form.highlight($input);
             } else {
                 this.unhighlight($input);
             }
@@ -197,10 +197,10 @@ $(function () {
             var fname = $id_attachedfile.val();
             if (!fname) {
                 $("#dftext").text("Choose a .pdf or .ps file.");
-                this.unhighlight($dummyfile);
+                form.unhighlight($dummyfile);
             } else {
                 $("#dftext").text($id_attachedfile.val());
-                this.highlight($dummyfile);
+                form.highlight($dummyfile);
             }
         },
     };

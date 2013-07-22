@@ -54,7 +54,7 @@ def handleJob(job, username, password, convert=True, send_print=True):
             job.update_status("Sending print job to "+job.printer+".")
             cmd = "/usr/local/bin/lpr -P '%s' '%s' && echo 'Job Sent!'" % (job.printer, rfilename)
             (outstr, errstr) = exec_command(cmd)
-            if outstr != "Job sent!":
+            if outstr != "Job sent!\n":
                 raise paramiko.SSHException("Error sending file to printer.\nstderr: %s\nstdout: %s" % (errstr, outstr))
             job.update_status("Done sending print job!")
         exec_command('rm -f "%s"' % (rfilename))
